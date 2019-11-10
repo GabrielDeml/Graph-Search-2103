@@ -1,13 +1,24 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IMDBGraphImpl implements IMDBGraph {
+    /**
+     * Whether or not to read the entire file
+     * todo set to true before submission
+     */
+    private static final boolean READ_ENTIRE_FILE = false;
+    /**
+     * If READ_ENTIRE_FILE is false, how many lines of actual data the program should read
+     * If READ_ENTIRE_FILE is true, this field is ignored
+     */
+    private static final int LINES_TO_READ = 100000;
     /**
      * A map representing the performers (the performer's name maps to their Node)
      */
     private Map<String, Node> performers;
-
     /**
      * A map representing the movies (the movie's name maps to its Node)
      * (NodeImpl chosen instead of Node because .addNeighbor() will need to be called on the movie Nodes)
@@ -21,6 +32,7 @@ public class IMDBGraphImpl implements IMDBGraph {
      * @param actressesFilename the path to the actress' database file
      * @throws IOException if either file is non-existent, cannot be opened, etc.
      */
+    @SuppressWarnings("WeakerAccess")
     public IMDBGraphImpl(String actorsFilename, String actressesFilename) throws IOException {
         performers = new HashMap<>();
         movies = new HashMap<>();
@@ -41,19 +53,16 @@ public class IMDBGraphImpl implements IMDBGraph {
         // Now, we need to populate the data
         String currPerformer = null;
         Collection<String> movies = new ArrayList<>();
-        for (int i = 0; i < 100000 && scanner.hasNextLine(); ++i) {
-        // while (scanner.hasNextLine()) { todo uncomment to test entire db
+        for (int i = 0; i < LINES_TO_READ && scanner.hasNextLine(); ) {
+            if (!READ_ENTIRE_FILE) ++i;
             final String currLine = scanner.nextLine();
-            if (currLine.isEmpty()) continue; // fixme this may need to be .length() < 4 or something
+            if (currLine.length() < 3) continue; // if the line is effectively empty (< 3 accounts for whitespace)
             if (currLine.charAt(0) == '\t') { // A new movie entry for the current performer
                 addMovieToList(currLine, movies);
             } else { // A new performer
                 processPerformer(currPerformer, movies); // processes the old performer
                 // Setup the new performer
-                currPerformer = currLine.substring(currLine.indexOf('\t')); // fixme may need to be (index of tab) - 1? (to account for trailing space)
-                if (currPerformer.charAt(currPerformer.length() - 1) == ' ') { // todo remove this (a note to self in case code doesn't work)
-                    System.out.println("Current performer ends in a space character. Fix this!"); // todo remove this
-                } // todo remove this
+                currPerformer = currLine.substring(0, currLine.indexOf('\t'));
                 movies = new ArrayList<>();
                 // Add the movie on the current line to the performer's movies collection
                 addMovieToList(currLine, movies);
@@ -62,42 +71,39 @@ public class IMDBGraphImpl implements IMDBGraph {
     }
 
     /**
+     * Trims a line from the database to just the movie's title
+     * static so it can be easier used in testing
+     *
+     * @param line the line to trim down to just the movie's title
+     * @return the movie's title and its year in the format: Movie Name (2019) or null
+     */
+    static String trimLineToTitle(String line) {
+        if (line == null || line.contains("(TV)")) return null; // either null or a TV movie
+        int startIndex = line.indexOf('\t'), endIndex;
+        if (startIndex == -1) return null; // no tabs in line, meaning it is not a data entry
+        while (startIndex < line.length() && line.charAt(startIndex) == '\t') {
+            ++startIndex;
+        }
+        // Stop if line was just all tabs with no actual data or if the line is a TV series
+        if (startIndex >= line.length() || line.charAt(startIndex) == '"') return null;
+        // At this point, startIndex is set to the first character of the movie title
+        // Now we need to find the index at which the year in parentheses ends (the endIndex)
+        // This is easiest through finding the endIndex of a regex match for the year in parentheses
+        final Matcher yearMatcher = Pattern.compile("\\(\\d{4,}\\)").matcher(line);
+        if (yearMatcher.find()) endIndex = yearMatcher.end();
+        else return null; // could not find a year (of 4+ digits) in parentheses, so not a valid entry
+        return line.substring(startIndex, endIndex);
+    }
+
+    /**
      * Parses the given line and adds it to the movies collection if it is a valid movie
      *
-     * @param movieInfo the current line from the database
-     * @param movies    the movies collection to add the current movie to
+     * @param movieInfoLine the current line from the database
+     * @param movies        the movies collection to add the current movie to
      */
-    private void addMovieToList(String movieInfo, Collection<String> movies) {
-        if (movieInfo.contains(" (TV) ")) return; // a TV movie
-        // Trim everything before the title
-        String preTitleTrimmed = null;
-        for (int i = movieInfo.indexOf('\t'); i != -1 && i < movieInfo.length(); ++i) {
-            if (movieInfo.charAt(i) != '\t') {
-                preTitleTrimmed = movieInfo.substring(i);
-                break;
-            }
-        }
-        if (preTitleTrimmed == null) return; // something went wrong in parsing the title
-        if (preTitleTrimmed.charAt(0) == '"') return; // a TV series
-        // Find where the title and year stops (by finding (####))
-        // The reason we are finding the index like this is in case the title itself contains parentheses
-        int cutOffIndex = -1;
-        boolean leftYearParenEncountered = false;
-        for (int i = 0; i < preTitleTrimmed.length(); ++i) {
-            final char c = preTitleTrimmed.charAt(i);
-            if (c == '(') {
-                leftYearParenEncountered = true;
-            } else if (c == ')') {
-                if (leftYearParenEncountered) {
-                    cutOffIndex = i; // fixme probably needs to be i + 1 to work properly with substring
-                    break;
-                }
-            } else if (c < '0' || c > '9') {
-                leftYearParenEncountered = false;
-            }
-        }
-        if (cutOffIndex == -1) return;
-        movies.add(preTitleTrimmed.substring(0, cutOffIndex));
+    private void addMovieToList(String movieInfoLine, Collection<String> movies) {
+        final String movieTitle = trimLineToTitle(movieInfoLine);
+        if (movieTitle != null) movies.add(movieTitle);
     }
 
     /**
@@ -111,7 +117,7 @@ public class IMDBGraphImpl implements IMDBGraph {
         final NodeImpl performer = new NodeImpl(name);
         final Collection<Node> performersMovies = new ArrayList<>(movieTitles.size());
         for (String title : movieTitles) {
-            NodeImpl movieNode = this.movies.get(title);
+            NodeImpl movieNode = movies.get(title);
             if (movieNode == null) movieNode = new NodeImpl(title);
             movieNode.addNeighbor(performer);
             movies.put(title, movieNode);

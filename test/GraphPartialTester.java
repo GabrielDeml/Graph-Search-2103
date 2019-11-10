@@ -10,8 +10,12 @@ import java.io.*;
  * Code to test Project 3; you should definitely add more tests!
  */
 public class GraphPartialTester {
-    IMDBGraph imdbGraph;
-    GraphSearchEngine searchEngine;
+    private IMDBGraph imdbGraph;
+    private GraphSearchEngine searchEngine;
+
+    // todo -- make actors_test.list and actresses_test.list the first 100,000 lines of their respective files
+    // todo -- in addition, make READ_ENTIRE_FILE true in IMDBGraphImpl when this happens
+    // todo --    and do the todo in setUp()
 
     /**
      * Verifies that there is no shortest path between a specific and actor and actress.
@@ -25,79 +29,99 @@ public class GraphPartialTester {
         assertNull(shortestPath);  // there is no path between these people
     }
 
-    @Before
     /**
      * Instantiates the graph
      */
+    @Before
     public void setUp() throws IOException {
-        // imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
-        // searchEngine = new GraphSearchEngineImpl(); todo uncomment when GraphSearchEngineImpl is finished
-        imdbGraph = new IMDBGraphImpl("/home/gconrad/Downloads/IMDB/actors.list", "/home/gconrad/Downloads/IMDB/actresses.list");
+        // imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list"); todo uncomment
+        searchEngine = new GraphSearchEngineImpl();
+        imdbGraph = new IMDBGraphImpl("/home/gconrad/Downloads/IMDB/actors.list",
+                "/home/gconrad/Downloads/IMDB/actresses.list"); // todo comment out
     }
 
-    @Test
     /**
      * Just verifies that the graphs could be instantiated without crashing.
      */
+    @Test
     public void finishedLoading() {
         assertTrue(true);
         // Yay! We didn't crash
     }
 
-    @Test
     /**
-     * Verifies that a specific movie has been parsed.
+     * Tests the trimToTitle method
      */
-    public void testSpecificMovie() {
-        testFindNode(imdbGraph.getMovies(), "Movie1 (2001)");
+    @Test
+    public void testTrimToTitle() {
+        assertNull(IMDBGraphImpl.trimLineToTitle(""));
+        assertEquals("Natas es Satan (1977)",
+                IMDBGraphImpl.trimLineToTitle("'Cartucho' Pena, Ramon\tNatas es Satan (1977)  [Nigth Club Owner]\n"));
+        assertEquals("All Out War (2013)",
+                IMDBGraphImpl.trimLineToTitle("'Casper' Brown, Jesse\tAll Out War (2013)  (as Jesse Brown)"));
+        assertEquals("Avril Lavigne: The Best Damn Tour - Live in Toronto (2008)",
+                IMDBGraphImpl.trimLineToTitle("\t\t\tAvril Lavigne: The Best Damn Tour - Live in Toronto (2008) \n"));
+        assertEquals("B-Girl (2009)",
+                IMDBGraphImpl.trimLineToTitle("\t\t\tB-Girl (2009)  [Battle Judge]  <25>\n"));
+        assertEquals("Battle of the Year (2013)",
+                IMDBGraphImpl.trimLineToTitle("\t\t\tBattle of the Year (2013)  [Rebel]  <9>"));
+        assertEquals("Breakin' Till Dawn (2011)",
+                IMDBGraphImpl.trimLineToTitle("\t\t\tBreakin' Till Dawn (2011)  (as Jesse Brown)  [Mini-Van]\n"));
+        assertEquals("DJ Dizzy's Dance Hizzy (2005)",
+                IMDBGraphImpl.trimLineToTitle("\t\t\tDJ Dizzy's Dance Hizzy (2005) (V)  (as Jesse Brown)  [Casper]"));
+        assertNull(IMDBGraphImpl.trimLineToTitle("\t\t\tLemonade Mouth (2011) (TV)  (as Jesse Casper")); // tv movie
+        assertNull(IMDBGraphImpl.trimLineToTitle("\t\t\t\"The LXD: The Legion of Extraordinary Dancers\" (2010)"));
+        assertNull(IMDBGraphImpl.trimLineToTitle("\t\t\t\"Treme\" (2010) {Carnival Time (#2.7)}  ")); // tv series
+        assertNull(IMDBGraphImpl.trimLineToTitle("\t\t\t\"Star Camp\" (2007) {Finale (#1.6)} ")); // tv series
+        assertEquals("The Emancipation of Anemone (2016)",
+                IMDBGraphImpl.trimLineToTitle("'Cherry, Sahel  \t\tThe Emancipation of Anemone (2016)  [Chorus]\n"));
+        assertEquals("Out of Bounds (2012)",
+                IMDBGraphImpl.trimLineToTitle("'Chippa' Wilson, Chris \tOut of Bounds (2012)  [Himself]  <1>\n"));
+        assertNull(IMDBGraphImpl.trimLineToTitle("'Chu' Estes, Marquis\t\"Moesha\" (1996) {The List (#2.1)}  "));
     }
 
+    /**
+     * Verifies that specific movies have been parsed.
+     */
     @Test
+    public void testSpecificMovies() {
+        testFindNode(imdbGraph.getMovies(), "Caceria de judiciales (1997)");
+        testFindNode(imdbGraph.getMovies(), "El secuestro de un periodista (1992)");
+        testFindNode(imdbGraph.getMovies(), "Violencia en la sierra (1995)");
+        assertTrue(imdbGraph.getMovie("Violencia en la sierra (1995)").getNeighbors()
+                .contains(imdbGraph.getActor("'La Chispa', Tony")));
+        testFindNode(imdbGraph.getMovies(), "A Woman's Face (1941)");
+        testFindNode(imdbGraph.getMovies(), "Bikini Bistro (1995)");
+        testFindNode(imdbGraph.getMovies(), "Erotik auf der Schulbank (1968)");
+        assertTrue(imdbGraph.getMovie("Erotik auf der Schulbank (1968)").getNeighbors()
+                .contains(imdbGraph.getActor("Aabel, Hauk (II)")));
+    }
+
     /**
      * Verifies that specific performers have been parsed correctly
      */
+    @Test
     public void testSpecificPerformers() {
-        // todo extract below test and make one common helper function that can easily test more performers
+        // Test for an actor
         testFindNode(imdbGraph.getActors(), "'La Chispa', Tony");
-        final int[] i = {0}; // array instead of just int to work inside lambda
-        imdbGraph.getActor("'La Chispa', Tony").getNeighbors().forEach((Node movie) -> {
-            switch (i[0]) {
-                case 0:
-                    assertEquals("Caceria de judiciales (1997)", movie.getName());
-                    break;
-                case 1:
-                    assertEquals("El secuestro de un periodista (1992)", movie.getName());
-                    break;
-                case 2:
-                    assertEquals("Violencia en la sierra (1995)", movie.getName());
-                    break;
-            }
-            i[0]++;
-        });
-        assertEquals(3, i[0]);
-        i[0] = 0;
+        final Node actor = imdbGraph.getActor("'La Chispa', Tony");
+        assertTrue(actor.getNeighbors().contains(imdbGraph.getMovie("Caceria de judiciales (1997)")));
+        assertTrue(actor.getNeighbors().contains(imdbGraph.getMovie("El secuestro de un periodista (1992)")));
+        assertTrue(actor.getNeighbors().contains(imdbGraph.getMovie("Violencia en la sierra (1995)")));
+        assertEquals(3, actor.getNeighbors().size());
+        // Test for an actress
         testFindNode(imdbGraph.getActors(), "Aabel, Hauk (II)");
-        imdbGraph.getActor("Aabel, Hauk (II)").getNeighbors().forEach((Node movie) -> {
-            switch (i[0]) {
-                case 0:
-                    assertEquals("A Woman's Face (1941)", movie.getName());
-                    break;
-                case 1:
-                    assertEquals("Bikini Bistro (1995)", movie.getName());
-                    break;
-                case 2:
-                    assertEquals("Erotik auf der Schulbank (1968)", movie.getName());
-                    break;
-            }
-            i[0]++;
-        });
-        assertEquals(3, i[0]);
+        final Node actress = imdbGraph.getActor("Aabel, Hauk (II)");
+        assertTrue(actress.getNeighbors().contains(imdbGraph.getMovie("A Woman's Face (1941)")));
+        assertTrue(actress.getNeighbors().contains(imdbGraph.getMovie("Bikini Bistro (1995)")));
+        assertTrue(actress.getNeighbors().contains(imdbGraph.getMovie("Erotik auf der Schulbank (1968)")));
+        assertEquals(3, actress.getNeighbors().size());
     }
 
     /**
-     * Verifies that the specific graph contains a node with the specified name
+     * Verifies that the specific graph's nodes contains a node with the specified name
      *
-     * @param graph the IMDBGraph to search for the node
+     * @param nodes the nodes of the graph to search from
      * @param name  the name of the Node
      */
     private static void testFindNode(Collection<? extends Node> nodes, String name) {
