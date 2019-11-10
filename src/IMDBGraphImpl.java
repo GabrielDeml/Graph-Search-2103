@@ -41,7 +41,8 @@ public class IMDBGraphImpl implements IMDBGraph {
         // Now, we need to populate the data
         String currPerformer = null;
         Collection<String> movies = new ArrayList<>();
-        while (scanner.hasNextLine()) {
+        for (int i = 0; i < 100000 && scanner.hasNextLine(); ++i) {
+        // while (scanner.hasNextLine()) { todo uncomment to test entire db
             final String currLine = scanner.nextLine();
             if (currLine.isEmpty()) continue; // fixme this may need to be .length() < 4 or something
             if (currLine.charAt(0) == '\t') { // A new movie entry for the current performer
