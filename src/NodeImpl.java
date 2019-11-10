@@ -20,6 +20,7 @@ public class NodeImpl implements Node {
      *
      * @param name the name to construct the node with
      */
+    @SuppressWarnings("WeakerAccess")
     public NodeImpl(String name) {
         this.name = name;
         this.neighbors = new ArrayList<>();
@@ -30,6 +31,7 @@ public class NodeImpl implements Node {
      *
      * @param neighbor the neighbor to add
      */
+    @SuppressWarnings("WeakerAccess")
     public void addNeighbor(Node neighbor) {
         neighbors.add(neighbor);
     }
@@ -39,6 +41,7 @@ public class NodeImpl implements Node {
      *
      * @param neighbors the neighboring nodes to add
      */
+    @SuppressWarnings("WeakerAccess")
     public void addNeighbors(Collection<Node> neighbors) {
         this.neighbors.addAll(neighbors);
     }
