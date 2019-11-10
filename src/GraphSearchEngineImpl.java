@@ -7,14 +7,9 @@ public class GraphSearchEngineImpl implements GraphSearchEngine {
     public List<Node> findShortestPath(Node s, Node t) throws IOException {
         Queue<Node> queueToVisit = new LinkedList<>();
         HashMap<Node, Integer> alreadyVisited = new HashMap<Node, Integer>();
-//        addNeighborsToQueue(s, queueToVisit, alreadyVisited, 0);
-//        for (Node neighbor : n.getNeighbors()) {
-//            queueToVisit.add(neighbor);
-//            nodeToDistance.put(neighbor, distanceFromStart + 1);
-//        }
         int distanceFromStart = 0;
+        queueToVisit.add(s);
         while (queueToVisit.size() > 0) {
-
             Node n = queueToVisit.poll();
             if (!alreadyVisited.containsKey(n)) {
                 if (n == t){
@@ -35,26 +30,23 @@ public class GraphSearchEngineImpl implements GraphSearchEngine {
 
 
     private List<Node> generatePathToStart(Node s, Node t, HashMap nodeToDistance, int distanceFromStart) {
-        Queue<Node> queueToVisit = new LinkedList<>();
-//        HashMap<Node, Integer> alreadyVisited = new HashMap<Node, Integer>();
-        Set<Node> alreadyVisited = new HashSet<Node>();
-        addNeighborsToQueue(s, queueToVisit, alreadyVisited);
-        int i = 0;
+        Set<Node> queueToVisit = new HashSet<Node>();
+        List<Node> path = new List<Node>();
+        int distanceFromStart = 0;
+        queueToVisit.add(t);
         while (queueToVisit.size() > 0) {
-            Node n = queueToVisit.poll();
-            if (!nodeToDistance.containsKey(n)
-            ) {
+            Node n = queueToVisit.remove();
+            if (!alreadyVisited.contains(n)) {
                 if (n == t){
-
+                    return path;
                 }else{
-
-
-                    for (Node neighbor : node.getNeighbors()) {
-                        linkedList.add(neighbor);
-                        aV.add(neighbor);
+                    for (Node neighbor : n.getNeighbors()) {
+                        queueToVisit.add(neighbor);
+                        alreadyVisited.add(neighbor);
                     }
                 }
             }
+            distanceFromStart++;
         }
         return null;
     }
