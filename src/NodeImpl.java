@@ -16,17 +16,6 @@ public class NodeImpl implements Node {
     private Collection<Node> neighbors;
 
     /**
-     * Constructs a NodeImpl with a given name and neighbors
-     *
-     * @param name      the name to construct the Node with
-     * @param neighbors the neighbors of the Node to construct
-     */
-    public NodeImpl(String name, Collection<Node> neighbors) {
-        this.name = name;
-        this.neighbors = neighbors;
-    }
-
-    /**
      * Constructs a NodeImpl with the given name and no neighbors
      *
      * @param name the name to construct the node with
@@ -43,6 +32,15 @@ public class NodeImpl implements Node {
      */
     public void addNeighbor(Node neighbor) {
         neighbors.add(neighbor);
+    }
+
+    /**
+     * Adds a collection of nodes as neighbors
+     *
+     * @param neighbors the neighboring nodes to add
+     */
+    public void addNeighbors(Collection<Node> neighbors) {
+        this.neighbors.addAll(neighbors);
     }
 
     /**

@@ -10,6 +10,7 @@ public class IMDBGraphImpl implements IMDBGraph {
 
     /**
      * A map representing the movies (the movie's name maps to its Node)
+     * (NodeImpl chosen instead of Node because .addNeighbor() will need to be called on the movie Nodes)
      */
     private Map<String, NodeImpl> movies;
 
@@ -28,7 +29,7 @@ public class IMDBGraphImpl implements IMDBGraph {
     }
 
     /**
-     * Populates the performers and movies maps
+     * Populates the performers and movies maps from the given scanner
      *
      * @param scanner the scanner to read the information from
      */
@@ -40,7 +41,8 @@ public class IMDBGraphImpl implements IMDBGraph {
         // Now, we need to populate the data
         String currPerformer = null;
         Collection<String> movies = new ArrayList<>();
-        while (scanner.hasNextLine()) {
+        for (int i = 0; i < 100000 && scanner.hasNextLine(); ++i) {
+        // while (scanner.hasNextLine()) { todo uncomment to test entire db
             final String currLine = scanner.nextLine();
             if (currLine.isEmpty()) continue; // fixme this may need to be .length() < 4 or something
             if (currLine.charAt(0) == '\t') { // A new movie entry for the current performer
@@ -59,6 +61,12 @@ public class IMDBGraphImpl implements IMDBGraph {
         }
     }
 
+    /**
+     * Parses the given line and adds it to the movies collection if it is a valid movie
+     *
+     * @param movieInfo the current line from the database
+     * @param movies    the movies collection to add the current movie to
+     */
     private void addMovieToList(String movieInfo, Collection<String> movies) {
         if (movieInfo.contains(" (TV) ")) return; // a TV movie
         // Trim everything before the title
@@ -92,9 +100,15 @@ public class IMDBGraphImpl implements IMDBGraph {
         movies.add(preTitleTrimmed.substring(0, cutOffIndex));
     }
 
+    /**
+     * Adds a given performer and their movies to the graph
+     *
+     * @param name        the name of the performer
+     * @param movieTitles the titles of all the movies the performer is in
+     */
     private void processPerformer(String name, Collection<String> movieTitles) {
         if (name == null || movieTitles == null || name.isEmpty() || movieTitles.isEmpty()) return;
-        final Node performer = new NodeImpl(name);
+        final NodeImpl performer = new NodeImpl(name);
         final Collection<Node> performersMovies = new ArrayList<>(movieTitles.size());
         for (String title : movieTitles) {
             NodeImpl movieNode = this.movies.get(title);
@@ -103,7 +117,7 @@ public class IMDBGraphImpl implements IMDBGraph {
             movies.put(title, movieNode);
             performersMovies.add(movieNode);
         }
-        // todo add performersMovies to performer and clean up NodeImpl and do javadoc above
+        performer.addNeighbors(performersMovies);
         performers.put(name, performer);
     }
 
