@@ -31,18 +31,36 @@ public class GraphPartialTester {
     }
 
     /**
-     * Verifies that there is no shortest path between a specific and actor and actress.
+     * Verifies that there is a shortest path between a specific and actor and actress.
      */
     @Test(timeout = 5000)
     public void findShortestPathNotNull() throws IOException {
         imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
         final Node actor1 = imdbGraph.getActor("Actor1");
         final Node actress1 = imdbGraph.getActor("Actress1");
-        assertNotNull(actress1);
-        System.out.println(actress1.getName());
         final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress1);
-        System.out.println(shortestPath.toString());
-//        assert(shortestPath);  // there is no path between these people
+        System.out.println("\n\n\n");
+        printOutNodes(shortestPath);
+        assertEquals(shortestPath, new ArrayList<Node>(Arrays.asList(actor1, actress1)));
+    }
+
+
+    /**
+     * Verifies that there is a shortest path between a specific and actor and actress with two hops.
+     */
+
+    @Test(timeout = 5000)
+    public void findShortestPathTwoHop() throws IOException {
+        imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
+        final Node actress1 = imdbGraph.getActor("Actress2");
+        final Node movie2 = imdbGraph.getActor("Movie2 (2002)");
+        final Node actor2 = imdbGraph.getActor("Actor2");
+        final Node movie4 = imdbGraph.getActor("Movie4 (2004)");
+        final Node actor4 = imdbGraph.getActor("Actor4");
+        final List<Node> shortestPath = searchEngine.findShortestPath(actress1, actor4);
+        System.out.println("\n\n\n");
+        printOutNodes(shortestPath);
+        assertEquals(shortestPath, new ArrayList<Node>(Arrays.asList(actress1, movie2,  actor2, movie4, actor4)));
     }
 
     /**
@@ -148,6 +166,24 @@ public class GraphPartialTester {
             }
         }
         assertTrue(found);
+    }
+
+    /**
+     * Prints out a list of nodes nicely
+     * @param nodes
+     */
+    private void printOutNodes(List<Node> nodes) {
+        String tmpString = "";
+        int length = nodes.size();
+        int i = 0;
+        for (Node node : nodes) {
+            if (length == ++i) {
+                tmpString = tmpString + node.getName();
+            } else {
+                tmpString = tmpString + node.getName() + " -> ";
+            }
+        }
+        System.out.println(tmpString);
     }
 
 //    /**
