@@ -26,7 +26,23 @@ public class GraphPartialTester {
         final Node actor1 = imdbGraph.getActor("Actor1");
         final Node actress2 = imdbGraph.getActor("Actress2");
         final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress2);
+//        System.out.println(shortestPath.toString());
         assertNull(shortestPath);  // there is no path between these people
+    }
+
+    /**
+     * Verifies that there is no shortest path between a specific and actor and actress.
+     */
+    @Test(timeout = 5000)
+    public void findShortestPathNotNull() throws IOException {
+        imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
+        final Node actor1 = imdbGraph.getActor("Actor1");
+        final Node actress1 = imdbGraph.getActor("Actress1");
+        assertNotNull(actress1);
+        System.out.println(actress1.getName());
+        final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress1);
+        System.out.println(shortestPath.toString());
+//        assert(shortestPath);  // there is no path between these people
     }
 
     /**
@@ -36,8 +52,8 @@ public class GraphPartialTester {
     public void setUp() throws IOException {
         // imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list"); todo uncomment
         searchEngine = new GraphSearchEngineImpl();
-        imdbGraph = new IMDBGraphImpl("/home/gconrad/Downloads/IMDB/actors.list",
-                "/home/gconrad/Downloads/IMDB/actresses.list"); // todo comment out
+        imdbGraph = new IMDBGraphImpl("D:\\OneDrive - Worcester Polytechnic Institute (wpi.edu)\\B term F\\CS 2103\\project3\\project3\\IMDB\\actors.list",
+                "D:\\OneDrive - Worcester Polytechnic Institute (wpi.edu)\\B term F\\CS 2103\\project3\\project3\\IMDB\\actresses.list"); // todo comment out
     }
 
     /**
@@ -133,4 +149,16 @@ public class GraphPartialTester {
         }
         assertTrue(found);
     }
+
+//    /**
+//     * Verifies that there is no shortest path between a specific and actor and actress.
+//     */
+//    @Test(timeout = 5000)
+//    public void findShortestPath() throws IOException {
+//        imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
+//        final Node actor1 = imdbGraph.getActor("Actor1");
+//        final Node actress2 = imdbGraph.getActor("Actress2");
+//        final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress2);
+//        assertNull(shortestPath);  // there is no path between these people
+//    }
 }
