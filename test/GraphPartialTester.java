@@ -13,10 +13,6 @@ public class GraphPartialTester {
     private IMDBGraph imdbGraph;
     private GraphSearchEngine searchEngine;
 
-    // todo -- make actors_test.list and actresses_test.list the first 100,000 lines of their respective files
-    // todo -- in addition, make READ_ENTIRE_FILE true in IMDBGraphImpl when this happens
-    // todo --    and do the todo in setUp()
-
     /**
      * Verifies that there is no shortest path between a specific and actor and actress.
      */
@@ -41,14 +37,13 @@ public class GraphPartialTester {
         final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress1);
         System.out.println("\n\n\n");
         printOutNodes(shortestPath);
-        assertEquals(shortestPath, new ArrayList<Node>(Arrays.asList(actor1, actress1)));
+        assertEquals(shortestPath, new ArrayList<>(Arrays.asList(actor1, actress1)));
     }
 
 
     /**
      * Verifies that there is a shortest path between a specific and actor and actress with two hops.
      */
-
     @Test(timeout = 5000)
     public void findShortestPathTwoHop() throws IOException {
         imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
@@ -60,7 +55,7 @@ public class GraphPartialTester {
         final List<Node> shortestPath = searchEngine.findShortestPath(actress1, actor4);
         System.out.println("\n\n\n");
         printOutNodes(shortestPath);
-        assertEquals(shortestPath, new ArrayList<Node>(Arrays.asList(actress1, movie2,  actor2, movie4, actor4)));
+        assertEquals(shortestPath, new ArrayList<>(Arrays.asList(actress1, movie2, actor2, movie4, actor4)));
     }
 
     /**
@@ -68,10 +63,8 @@ public class GraphPartialTester {
      */
     @Before
     public void setUp() throws IOException {
-        // imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list"); todo uncomment
+        imdbGraph = new IMDBGraphImpl("IMDB/actors_10k.list", "IMDB/actresses_10k.list");
         searchEngine = new GraphSearchEngineImpl();
-        imdbGraph = new IMDBGraphImpl("D:\\OneDrive - Worcester Polytechnic Institute (wpi.edu)\\B term F\\CS 2103\\project3\\project3\\IMDB\\actors.list",
-                "D:\\OneDrive - Worcester Polytechnic Institute (wpi.edu)\\B term F\\CS 2103\\project3\\project3\\IMDB\\actresses.list"); // todo comment out
     }
 
     /**
@@ -170,20 +163,21 @@ public class GraphPartialTester {
 
     /**
      * Prints out a list of nodes nicely
-     * @param nodes
+     *
+     * @param nodes the nodes to print out
      */
     private void printOutNodes(List<Node> nodes) {
-        String tmpString = "";
+        StringBuilder tmpString = new StringBuilder();
         int length = nodes.size();
         int i = 0;
         for (Node node : nodes) {
             if (length == ++i) {
-                tmpString = tmpString + node.getName();
+                tmpString.append(node.getName());
             } else {
-                tmpString = tmpString + node.getName() + " -> ";
+                tmpString.append(node.getName()).append(" -> ");
             }
         }
-        System.out.println(tmpString);
+        System.out.println(tmpString.toString());
     }
 
 //    /**

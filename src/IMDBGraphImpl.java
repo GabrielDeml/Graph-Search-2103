@@ -7,9 +7,8 @@ import java.util.regex.Pattern;
 public class IMDBGraphImpl implements IMDBGraph {
     /**
      * Whether or not to read the entire file
-     * todo set to true before submission
      */
-    private static final boolean READ_ENTIRE_FILE = false;
+    private static final boolean READ_ENTIRE_FILE = true;
     /**
      * If READ_ENTIRE_FILE is false, how many lines of actual data the program should read
      * If READ_ENTIRE_FILE is true, this field is ignored
@@ -60,9 +59,13 @@ public class IMDBGraphImpl implements IMDBGraph {
             if (currLine.charAt(0) == '\t') { // A new movie entry for the current performer
                 addMovieToList(currLine, movies);
             } else { // A new performer
-                processPerformer(currPerformer, movies); // processes the old performer
+                // Make sure the line is properly formatted
+                final int tabIndex = currLine.indexOf('\t');
+                if (tabIndex < 0) continue;
+                // Process the old performer
+                processPerformer(currPerformer, movies);
                 // Setup the new performer
-                currPerformer = currLine.substring(0, currLine.indexOf('\t'));
+                currPerformer = currLine.substring(0, tabIndex);
                 movies = new ArrayList<>();
                 // Add the movie on the current line to the performer's movies collection
                 addMovieToList(currLine, movies);
