@@ -33,11 +33,12 @@ public class GraphPartialTester {
     public void findShortestPathNotNull() throws IOException {
         imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
         final Node actor1 = imdbGraph.getActor("Actor1");
+        final Node movie1 = imdbGraph.getActor("Movie1 (2001)"); //TODO This is returning null
         final Node actress1 = imdbGraph.getActor("Actress1");
         final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress1);
         System.out.println("\n\n\n");
         printOutNodes(shortestPath);
-        assertEquals(shortestPath, new ArrayList<>(Arrays.asList(actor1, actress1)));
+        assertEquals(shortestPath, new ArrayList<>(Arrays.asList(actor1, movie1, actress1)));
     }
 
 
