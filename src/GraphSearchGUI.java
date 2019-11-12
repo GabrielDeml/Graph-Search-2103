@@ -1,6 +1,4 @@
 import java.util.stream.*;
-import java.util.function.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -30,7 +28,7 @@ public class GraphSearchGUI extends Application {
 	 */
 	private static class StringComparator implements Comparator<String> {
 		public int compare (String obj1, String obj2) {
-			if (obj1 == obj2) {
+			if (Objects.equals(obj1, obj2)) {
 				return 0;
 			} else if (obj1 == null) {
 				return -1;
@@ -46,7 +44,7 @@ public class GraphSearchGUI extends Application {
 	 * Converts from a Collection to a List of Node objects.
 	 */
 	private static List<String> getNames (Collection<? extends Node> nodes) {
-		return nodes.stream().map(node -> node.getName()).collect(Collectors.toList());
+		return nodes.stream().map(Node::getName).collect(Collectors.toList());
 	}
 
 	/**
@@ -76,7 +74,7 @@ public class GraphSearchGUI extends Application {
 			List<Node> shortestPath = _searchEngine.findShortestPath(graph.getActor(actor1),
 										 graph.getActor(actor2));
 			if (shortestPath == null) {
-				List<String> nopath = new ArrayList<String>();
+				List<String> nopath = new ArrayList<>();
 				nopath.add("No path");
 				resultsList.getItems().setAll(FXCollections.observableList(nopath));
 				resultsLabel.setText("");
@@ -94,15 +92,15 @@ public class GraphSearchGUI extends Application {
 		// Load graph data and initialize the ListViews
 		final IMDBGraph graph;
 		try {
-			graph = new IMDBGraphImpl("/Users/jake/Courses/CS210X/Graph/IMDB/actors.list", "/Users/jake/Courses/CS210X/Graph/IMDB/actresses.list");
+			graph = new IMDBGraphImpl("IMDB/actors_10k.list", "IMDB/actresses_10k.list");
 		} catch (IOException ioe) {
 			System.out.println("Couldn't load data");
 			return;
 		}
 
-		final ListView<String> actorsList1 = new ListView<String>(getSortedObservableList(graph.getActors()));
-		final ListView<String> actorsList2 = new ListView<String>(getSortedObservableList(graph.getActors()));
-		final ListView<String> resultsList = new ListView<String>();
+		final ListView<String> actorsList1 = new ListView<>(getSortedObservableList(graph.getActors()));
+		final ListView<String> actorsList2 = new ListView<>(getSortedObservableList(graph.getActors()));
+		final ListView<String> resultsList = new ListView<>();
 
 		// Create the panels of the GIU
 		final VBox rootPanel = new VBox();
