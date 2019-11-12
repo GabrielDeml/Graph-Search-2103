@@ -92,7 +92,7 @@ public class IMDBGraphImpl implements IMDBGraph {
         // At this point, startIndex is set to the first character of the movie title
         // Now we need to find the index at which the year in parentheses ends (the endIndex)
         // This is easiest through finding the endIndex of a regex match for the year in parentheses
-        final Matcher yearMatcher = Pattern.compile("\\((\\?{4}|\\d{4,})\\)").matcher(line);
+        final Matcher yearMatcher = Pattern.compile("\\((\\?{4}|\\d{4,})(/[IVXLCDM]+)?\\)").matcher(line);
         if (yearMatcher.find()) endIndex = yearMatcher.end();
         else return null; // could not find a year (of 4+ digits) in parentheses, so not a valid entry
         return line.substring(startIndex, endIndex);
