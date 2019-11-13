@@ -10,17 +10,16 @@ import java.io.*;
  * Code to test Project 3; you should definitely add more tests!
  */
 public class GraphPartialTester {
-    private IMDBGraph imdbGraph;
+    private IMDBGraph imdbGraph, testGraph;
     private GraphSearchEngine searchEngine;
 
     /**
      * Verifies that there is no shortest path between a specific and actor and actress.
      */
     @Test(timeout = 5000)
-    public void findShortestPath() throws IOException {
-        imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
-        final Node actor1 = imdbGraph.getActor("Actor1");
-        final Node actress2 = imdbGraph.getActor("Actress2");
+    public void findShortestPath() {
+        final Node actor1 = testGraph.getActor("Actor1");
+        final Node actress2 = testGraph.getActor("Actress2");
         final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress2);
 //        System.out.println(shortestPath.toString());
         assertNull(shortestPath);  // there is no path between these people
@@ -30,11 +29,10 @@ public class GraphPartialTester {
      * Verifies that there is a shortest path between a specific and actor and actress.
      */
     @Test(timeout = 5000)
-    public void findShortestPathNotNull() throws IOException {
-        imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
-        final Node actor1 = imdbGraph.getActor("Actor1");
-        final Node movie1 = imdbGraph.getActor("Movie1 (2001)"); //TODO This is returning null
-        final Node actress1 = imdbGraph.getActor("Actress1");
+    public void findShortestPathNotNull() {
+        final Node actor1 = testGraph.getActor("Actor1");
+        final Node movie1 = testGraph.getActor("Movie1 (2001)"); //TODO This is returning null
+        final Node actress1 = testGraph.getActor("Actress1");
         final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress1);
         System.out.println("\n\n\n");
         printOutNodes(shortestPath);
@@ -46,13 +44,12 @@ public class GraphPartialTester {
      * Verifies that there is a shortest path between a specific and actor and actress with two hops.
      */
     @Test(timeout = 5000)
-    public void findShortestPathTwoHop() throws IOException {
-        imdbGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
-        final Node actress1 = imdbGraph.getActor("Actress2");
-        final Node movie2 = imdbGraph.getActor("Movie2 (2002)");
-        final Node actor2 = imdbGraph.getActor("Actor2");
-        final Node movie4 = imdbGraph.getActor("Movie4 (2004)");
-        final Node actor4 = imdbGraph.getActor("Actor4");
+    public void findShortestPathTwoHop() {
+        final Node actress1 = testGraph.getActor("Actress2");
+        final Node movie2 = testGraph.getActor("Movie2 (2002)");
+        final Node actor2 = testGraph.getActor("Actor2");
+        final Node movie4 = testGraph.getActor("Movie4 (2004)");
+        final Node actor4 = testGraph.getActor("Actor4");
         final List<Node> shortestPath = searchEngine.findShortestPath(actress1, actor4);
         System.out.println("\n\n\n");
         printOutNodes(shortestPath);
@@ -65,6 +62,7 @@ public class GraphPartialTester {
     @Before
     public void setUp() throws IOException {
         imdbGraph = new IMDBGraphImpl("IMDB/actors_10k.list", "IMDB/actresses_10k.list");
+        testGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
         searchEngine = new GraphSearchEngineImpl();
     }
 
@@ -144,6 +142,16 @@ public class GraphPartialTester {
         assertTrue(actress.getNeighbors().contains(imdbGraph.getMovie("Bikini Bistro (1995)")));
         assertTrue(actress.getNeighbors().contains(imdbGraph.getMovie("Erotik auf der Schulbank (1968)")));
         assertEquals(3, actress.getNeighbors().size());
+    }
+
+    /**
+     * Verifies the size of the IMDBGraphImpl after reading 10k lines is within the provided tolerance
+     */
+    @Test
+    public void testParsingTolerance() {
+        final int size = imdbGraph.getActors().size();
+        System.out.println("There were " + size + " performers read from the 10k line files.");
+        assertTrue(size >= 2100 && size <= 2300);
     }
 
     /**
