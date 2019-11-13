@@ -71,6 +71,8 @@ public class IMDBGraphImpl implements IMDBGraph {
                 addMovieToList(currLine, movies);
             }
         }
+        // If the last performer in the file was not added (which it probably wasn't), then add it
+        if (!performers.containsKey(currPerformer)) processPerformer(currPerformer, movies);
     }
 
     /**

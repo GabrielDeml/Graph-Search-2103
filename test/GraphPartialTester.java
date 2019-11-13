@@ -7,7 +7,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Code to test Project 3; you should definitely add more tests!
+ * Code to test Project 3
  */
 public class GraphPartialTester {
     private IMDBGraph imdbGraph, testGraph;
@@ -21,7 +21,6 @@ public class GraphPartialTester {
         final Node actor1 = testGraph.getActor("Actor1");
         final Node actress2 = testGraph.getActor("Actress2");
         final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress2);
-//        System.out.println(shortestPath.toString());
         assertNull(shortestPath);  // there is no path between these people
     }
 
@@ -31,12 +30,11 @@ public class GraphPartialTester {
     @Test(timeout = 5000)
     public void findShortestPathNotNull() {
         final Node actor1 = testGraph.getActor("Actor1");
-        final Node movie1 = testGraph.getActor("Movie1 (2001)"); //TODO This is returning null
+        final Node movie1 = testGraph.getMovie("Movie1 (2001)");
         final Node actress1 = testGraph.getActor("Actress1");
         final List<Node> shortestPath = searchEngine.findShortestPath(actor1, actress1);
-        System.out.println("\n\n\n");
         printOutNodes(shortestPath);
-        assertEquals(shortestPath, new ArrayList<>(Arrays.asList(actor1, movie1, actress1)));
+        assertEquals(new ArrayList<>(Arrays.asList(actor1, movie1, actress1)), shortestPath);
     }
 
 
@@ -45,15 +43,14 @@ public class GraphPartialTester {
      */
     @Test(timeout = 5000)
     public void findShortestPathTwoHop() {
-        final Node actress1 = testGraph.getActor("Actress2");
-        final Node movie2 = testGraph.getActor("Movie2 (2002)");
+        final Node actress2 = testGraph.getActor("Actress2");
+        final Node movie2 = testGraph.getMovie("Movie2 (2002)");
         final Node actor2 = testGraph.getActor("Actor2");
-        final Node movie4 = testGraph.getActor("Movie4 (2004)");
+        final Node movie4 = testGraph.getMovie("Movie4 (2004)");
         final Node actor4 = testGraph.getActor("Actor4");
-        final List<Node> shortestPath = searchEngine.findShortestPath(actress1, actor4);
-        System.out.println("\n\n\n");
+        final List<Node> shortestPath = searchEngine.findShortestPath(actress2, actor4);
         printOutNodes(shortestPath);
-        assertEquals(shortestPath, new ArrayList<>(Arrays.asList(actress1, movie2, actor2, movie4, actor4)));
+        assertEquals(new ArrayList<>(Arrays.asList(actress2, movie2, actor2, movie4, actor4)), shortestPath);
     }
 
     /**
@@ -165,6 +162,7 @@ public class GraphPartialTester {
         for (Node node : nodes) {
             if (node.getName().trim().equals(name)) {
                 found = true;
+                break;
             }
         }
         assertTrue(found);
@@ -176,17 +174,18 @@ public class GraphPartialTester {
      * @param nodes the nodes to print out
      */
     private void printOutNodes(List<Node> nodes) {
-        StringBuilder tmpString = new StringBuilder();
-        int length = nodes.size();
-        int i = 0;
-        for (Node node : nodes) {
-            if (length == ++i) {
-                tmpString.append(node.getName());
-            } else {
-                tmpString.append(node.getName()).append(" -> ");
-            }
+        if (nodes == null) {
+            System.out.println("Nodes list was null");
+            return;
         }
-        System.out.println(tmpString.toString());
+        StringBuilder nodesStr = new StringBuilder();
+        int length = nodes.size();
+        for (int i = 0; i < nodes.size(); ++i) {
+            final String currNode = (nodes.get(i) == null) ? "null" : nodes.get(i).getName();
+            if (i == length - 1) nodesStr.append(currNode);
+            else nodesStr.append(currNode).append(" -> ");
+        }
+        System.out.println(nodesStr.toString());
     }
 
 //    /**
