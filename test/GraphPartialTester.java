@@ -54,11 +54,27 @@ public class GraphPartialTester {
     }
 
     /**
+     * Verifies that there is a shortest path between a specific and actor and actress with two hops.
+     */
+    @Test(timeout = 5000)
+    public void findShortestPathUsingIMDB() {
+        final Node Kevin = imdbGraph.getActor("Bacon, Kevin");
+//        final Node movie2 = imdbGraph.getMovie("Movie2 (2002)");
+//        final Node actor2 = imdbGraph.getActor("Actor2");
+//        final Node movie4 = imdbGraph.getMovie("Movie4 (2004)");
+        final Node Brad = imdbGraph.getActor("Pitt, Brad");
+        final List<Node> shortestPath = searchEngine.findShortestPath(Kevin, Brad);
+        System.out.println("printing out nodes:");
+        printOutNodes(shortestPath);
+//        assertEquals(new ArrayList<>(Arrays.asList(actress2, movie2, actor2, movie4, actor4)), shortestPath);
+    }
+
+    /**
      * Instantiates the graph
      */
     @Before
     public void setUp() throws IOException {
-        imdbGraph = new IMDBGraphImpl("IMDB/actors_10k.list", "IMDB/actresses_10k.list");
+        imdbGraph = new IMDBGraphImpl("IMDB/actors.list", "IMDB/actresses.list");
         testGraph = new IMDBGraphImpl("actors_test.list", "actresses_test.list");
         searchEngine = new GraphSearchEngineImpl();
     }
