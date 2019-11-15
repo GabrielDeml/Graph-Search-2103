@@ -8,12 +8,9 @@ public class GraphSearchEngineImpl implements GraphSearchEngine {
         Queue<Node> queueToVisit = new LinkedList<>();
         // These are all the nodes we have already visited or will visit and stores the distance from start node
         HashMap<Node, Integer> distanceMap = new HashMap<>();
-        //Keep track of already visited items and items we are planing to visit
-        Set<Node> alreadyVisited = new HashSet<Node>();
         // Add the first node to the queue and already visited and distance map
         queueToVisit.add(s);
         distanceMap.put(s, 0);
-        alreadyVisited.add(s);
         // While we still have things is queue
         while (queueToVisit.size() > 0) {
             // Grab the first node from the queue
@@ -25,9 +22,8 @@ public class GraphSearchEngineImpl implements GraphSearchEngine {
                 // add all of the neighbors to the queue and already visited
                 for (Node neighbor : n.getNeighbors()) {
                     // If we haven't seen this node
-                    if (!alreadyVisited.contains(neighbor)) {
-                        //Add to queues
-                        alreadyVisited.add(neighbor);
+                    if (!distanceMap.containsKey(neighbor)) {
+                        //Add to queue
                         queueToVisit.add(neighbor);
                         // We add one to the depth of the parent to keep the distance from start right
                         distanceMap.put(neighbor, distanceMap.get(n) + 1);
