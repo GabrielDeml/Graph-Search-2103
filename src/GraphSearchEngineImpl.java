@@ -20,13 +20,15 @@ public class GraphSearchEngineImpl implements GraphSearchEngine {
                 return generatePathToStart(s, t, distanceMap);
             } else {
                 // add all of the neighbors to the queue and already visited
-                for (Node neighbor : n.getNeighbors()) {
-                    // If we haven't seen this node
-                    if (!distanceMap.containsKey(neighbor)) {
-                        //Add to queue
-                        queueToVisit.add(neighbor);
-                        // We add one to the depth of the parent to keep the distance from start right
-                        distanceMap.put(neighbor, distanceMap.get(n) + 1);
+                if (n != null && n.getNeighbors() != null && n.getNeighbors().size() != 0) {
+                    for (Node neighbor : n.getNeighbors()) {
+                        // If we haven't seen this node
+                        if (!distanceMap.containsKey(neighbor)) {
+                            //Add to queue
+                            queueToVisit.add(neighbor);
+                            // We add one to the depth of the parent to keep the distance from start right
+                            distanceMap.put(neighbor, distanceMap.get(n) + 1);
+                        }
                     }
                 }
             }
@@ -49,7 +51,7 @@ public class GraphSearchEngineImpl implements GraphSearchEngine {
             //Get the first thing on the list
             Node n = queueToVisit.poll();
             // When we find a node that is a shorter distance from start
-            if (nodeToDistance.get(n) <= distanceFromStart) {
+            if (nodeToDistance.containsKey(n) && nodeToDistance.get(n) <= distanceFromStart) {
                 // Set the distance closer
                 distanceFromStart--;
                 // Add N to the path to get to start
