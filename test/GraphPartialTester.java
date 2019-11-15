@@ -58,11 +58,11 @@ public class GraphPartialTester {
      */
     @Test(timeout = 5000)
     public void findShortestPathUsingIMDB() {
-        final Node Kevin = imdbGraph.getActor("Bacon, Kevin");
-//        final Node movie2 = imdbGraph.getMovie("Movie2 (2002)");
-//        final Node actor2 = imdbGraph.getActor("Actor2");
-//        final Node movie4 = imdbGraph.getMovie("Movie4 (2004)");
-        final Node Brad = imdbGraph.getActor("Pitt, Brad");
+        final Node Kevin = imdbGraph.getActor("Darnell, Linda");
+        final Node movie2 = imdbGraph.getMovie("Black Spurs (1965)");
+        final Node actor2 = imdbGraph.getActor("Baird, Jeanne");
+        final Node movie4 = imdbGraph.getMovie("Get Outta Town (1960)");
+        final Node Brad = imdbGraph.getActor("Casey, Val");
         final List<Node> shortestPath = searchEngine.findShortestPath(Kevin, Brad);
         System.out.println("printing out nodes:");
         printOutNodes(shortestPath);
