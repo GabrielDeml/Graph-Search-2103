@@ -2,6 +2,13 @@ import java.util.*;
 
 public class GraphSearchEngineImpl implements GraphSearchEngine {
 
+    /**
+     * Find the shortest path between two nodes
+     * @param s the start node.
+     * @param t the target node.
+     * @return the shortest path between two nodes
+     */
+
     @Override
     public List<Node> findShortestPath(Node s, Node t) {
         // Make the queue of nodes we need to visit
@@ -36,6 +43,14 @@ public class GraphSearchEngineImpl implements GraphSearchEngine {
         }
         return null;
     }
+
+    /**
+     * Generate the path to the first node
+     * @param s the first node
+     * @param t the last node
+     * @param nodeToDistance map of a node to the distance to start
+     * @return the path from the first node to the last
+     */
 
     private List<Node> generatePathToStart(Node s, Node t, HashMap<Node, Integer> nodeToDistance) {
         // Make the queue and list path to start list
